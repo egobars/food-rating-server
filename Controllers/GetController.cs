@@ -25,6 +25,15 @@ namespace food_rating_server.Controllers
         public JsonResult Product(int id)
         {
             Product product = _dBContext.Products.Where(product => product.Id == id).FirstOrDefault();
+
+            return Json(new {
+                product = product
+            });
+        }
+
+        [HttpGet]
+        public JsonResult Comments(int id)
+        {
             List<Comment> comments = new List<Comment>();
             if (_dBContext.Comments.Where(comment => comment.ProductId == id).Count() != 0)
             {
@@ -86,7 +95,6 @@ namespace food_rating_server.Controllers
                 publicComments.Add(publicComment);
             }
             return Json(new {
-                product = product,
                 comments = publicComments
             });
         }

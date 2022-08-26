@@ -57,7 +57,7 @@ namespace food_rating_server.Controllers
 
             return Ok();
         }
-        
+
         [HttpPost]
         async public Task<IActionResult> Comment()
         {
@@ -97,7 +97,21 @@ namespace food_rating_server.Controllers
 
             _dBContext.SaveChanges();
 
-            return Ok();
+            PublicComment publicComment = new PublicComment
+            {
+                Id = comment.Id,
+                Mark = comment.Mark,
+                Text = comment.Text,
+                Author = comment.Author,
+                Created = comment.Created,
+                Score = comment.Score,
+                CanRate = true
+            };
+
+            return Json(new
+            {
+                comment = publicComment
+            });
         }
 
         [HttpPost]
