@@ -1,7 +1,10 @@
 ﻿using food_rating_server.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 using System.Security.Claims;
+using System.Text.RegularExpressions;
 
 namespace food_rating_server.Controllers
 {
@@ -15,10 +18,31 @@ namespace food_rating_server.Controllers
         }
 
         [HttpGet]
-        public JsonResult Products()
+        [Route("api/get/products/{search?}")]
+        async public Task<JsonResult> Products(string search)
         {
-            List<Product> productsList = _dBContext.Products.ToList();
-            return Json(new { products = productsList });
+            List<Product> productsList;
+            if (search == null)
+            {
+                productsList = _dBContext.Products.ToList();
+                return Json(new { products = productsList });
+            }
+            search = @"\w*" + search + @"\w*";
+            Regex regex = new Regex(search, RegexOptions.Compiled | RegexOptions.IgnoreCase);
+            var allProductNamesList = await _dBContext.Products.Select(product => product.Name).ToListAsync();
+            var productsNameList = allProductNamesList.Where(name => regex.Matches(name).Count != 0);
+
+            productsList = new List<Product>();
+
+            foreach (string productName in productsNameList)
+            {
+                productsList.Add(_dBContext.Products.Where(product => product.Name == productName).FirstOrDefault());
+            }
+
+            return Json(new
+            {
+                products = productsList
+            });
         }
 
         [HttpGet]

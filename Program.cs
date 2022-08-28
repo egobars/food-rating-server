@@ -35,4 +35,8 @@ app.MapControllerRoute(
     name: "default",
     pattern: "api/{controller}/{action}/{id?}");
 
+app.MapControllerRoute(
+    name: "search",
+    pattern: "api/{controller}/{action}/{search?}");
+
 app.Run();
